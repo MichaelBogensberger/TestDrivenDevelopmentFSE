@@ -57,6 +57,10 @@ public class Vorstellung {
         return ticket;
     }
 
+    public float getPreis() {
+        return preis;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Vorstellung)) {
@@ -66,4 +70,15 @@ public class Vorstellung {
         return saal.equals(otherV.getSaal()) && zeitfenster == otherV.getZeitfenster() && datum.isEqual(otherV.getDatum());
     }
 
+    @Override
+    public String toString() {
+        return "Vorstellung{" +
+                "saal=" + saal +
+                ", zeitfenster=" + zeitfenster +
+                ", datum=" + datum +
+                ", film='" + film + '\'' +
+                ", preis=" + preis +
+                ", tickets=" + tickets +
+                '}';
+    }
 }

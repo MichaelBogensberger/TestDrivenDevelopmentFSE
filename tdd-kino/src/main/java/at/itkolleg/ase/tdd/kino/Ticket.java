@@ -42,4 +42,14 @@ public class Ticket {
         return platz;
     }
 
+    @Override
+    public String toString() {
+        return "Ticket{" +
+                "saal='" + saal + '\'' +
+                ", zeitfenster=" + zeitfenster +
+                ", datum=" + datum +
+                ", reihe=" + reihe +
+                ", platz=" + platz +
+                '}';
+    }
 }
