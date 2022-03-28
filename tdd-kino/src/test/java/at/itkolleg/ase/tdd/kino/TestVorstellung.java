@@ -1,5 +1,6 @@
 package at.itkolleg.ase.tdd.kino;
 
+import com.sun.jdi.IncompatibleThreadStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -7,6 +8,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TestVorstellung {
 
@@ -23,25 +25,43 @@ public class TestVorstellung {
         map.put('B', 10);
         map.put('C', 15);
         kinoSaal = new KinoSaal("KS1", map);
-
         kinoSaal1 = new KinoSaal("KS2", map);
+
+        vorstellung = new Vorstellung(kinoSaal,Zeitfenster.ABEND, LocalDate.parse("2020-01-08"),"Pulp Fiction", 10.3f);
     }
 
     @Test
     void testCreateNewVorstellung() {
-        vorstellung = new Vorstellung(kinoSaal,Zeitfenster.ABEND, LocalDate.parse("2020-01-08"),"Pulp Fiction", 10.3f);
-
 
         assertNotNull(vorstellung, "Vortstellung ist NULL");
+        assertTrue(vorstellung instanceof Vorstellung, "Vorstellung ist nicht eine Insatz einer Vorstellung");
 
-        assertEquals(kinoSaal, vorstellung.getSaal(), "Fehler beim Kinosaal checken");
-        assertEquals(Zeitfenster.ABEND, vorstellung.getZeitfenster(), "Fehler beim Zeitfenster checken");
-        assertEquals(LocalDate.parse("2020-01-08"), vorstellung.getDatum(), "Fehler beim Datum checken");
-        assertEquals("Pulp Fiction", vorstellung.getFilm(), "Fehler beim Film checken");
-        assertEquals(10.3f, vorstellung.getPreis(), "Fehler beim Preis checken");
-
+        assertEquals(kinoSaal, vorstellung.getSaal(), "Fehler beim Kinosaal");
+        assertEquals(Zeitfenster.ABEND, vorstellung.getZeitfenster(), "Fehler beim Zeitfenster");
+        assertEquals(LocalDate.parse("2020-01-08"), vorstellung.getDatum(), "Fehler beim Datum");
+        assertEquals("Pulp Fiction", vorstellung.getFilm(), "Fehler beim Film");
+        assertEquals(10.3f, vorstellung.getPreis(), "Fehler beim Preis");
 
     }
+
+    @Test
+    void testKaufeTicket() {
+        Ticket ticket = vorstellung.kaufeTicket('A',7,30);
+        assertTrue(ticket instanceof Ticket);
+
+        // Teste Assertions
+        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',7,2), "Nicht genug Geld Fehlermeldung nicht zurückgegeben");
+        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',30,30), "Platz Fehlermeldung nicht zurückgegeben");
+        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('G',3,30), "Reihe Fehlermeldung nicht zurückgegeben");
+        assertThrows(IllegalStateException.class, () -> vorstellung.kaufeTicket('A',7,30), "Platz bereits belegt Meldung nicht zurückgegeben");
+    }
+
+    @Test
+    void testIfVorstellungIsInstanceOfVorstellung() {
+        assertTrue(vorstellung.equals(vorstellung));
+        assertFalse(vorstellung.equals(new Object()));
+    }
+
 
 
 

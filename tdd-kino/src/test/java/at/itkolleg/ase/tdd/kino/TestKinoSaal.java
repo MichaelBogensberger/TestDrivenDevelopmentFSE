@@ -28,7 +28,6 @@ public class TestKinoSaal {
 
     @Test
     void testPruefePlatz() {
-
         assertTrue(kinoSaal.pruefePlatz('A', 8));
         assertFalse(kinoSaal.pruefePlatz('B',11));
         assertTrue(kinoSaal.pruefePlatz('C',1));
