@@ -43,6 +43,7 @@ public class TestKinoVerwaltung {
         vorstellung2 = new Vorstellung(kinoSaal,Zeitfenster.NACHMITTAG, LocalDate.parse("2022-01-18"),"Reservoir Dogs", 8.3f);
     }
 
+
     @Test
     void testVorstellungEinplanen() {
         //SoftAssertions soft = new SoftAssertions();
