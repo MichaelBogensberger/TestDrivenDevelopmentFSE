@@ -33,14 +33,21 @@ public class TestVorstellung {
     @Test
     void testCreateNewVorstellung() {
 
+
+
         assertNotNull(vorstellung, "Vortstellung ist NULL");
         assertTrue(vorstellung instanceof Vorstellung, "Vorstellung ist nicht eine Insatz einer Vorstellung");
 
-        assertEquals(kinoSaal, vorstellung.getSaal(), "Fehler beim Kinosaal");
-        assertEquals(Zeitfenster.ABEND, vorstellung.getZeitfenster(), "Fehler beim Zeitfenster");
-        assertEquals(LocalDate.parse("2020-01-08"), vorstellung.getDatum(), "Fehler beim Datum");
-        assertEquals("Pulp Fiction", vorstellung.getFilm(), "Fehler beim Film");
-        assertEquals(10.3f, vorstellung.getPreis(), "Fehler beim Preis");
+
+        assertAll("check parameters",
+                () ->  assertEquals(kinoSaal, vorstellung.getSaal(), "Fehler beim Kinosaal"),
+                () -> assertEquals(Zeitfenster.ABEND, vorstellung.getZeitfenster(), "Fehler beim Zeitfenster"),
+                () -> assertEquals(LocalDate.parse("2020-01-08"), vorstellung.getDatum(), "Fehler beim Datum"),
+                () -> assertEquals("Pulp Fiction", vorstellung.getFilm(), "Fehler beim Film"),
+                () -> assertEquals(10.3f, vorstellung.getPreis(), "Fehler beim Preis")
+        );
+
+
 
     }
 
@@ -50,11 +57,20 @@ public class TestVorstellung {
         assertTrue(ticket instanceof Ticket);
 
         // Teste Assertions
-        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',7,2), "Nicht genug Geld Fehlermeldung nicht zurückgegeben");
-        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',30,30), "Platz Fehlermeldung nicht zurückgegeben");
-        assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('G',3,30), "Reihe Fehlermeldung nicht zurückgegeben");
-        assertThrows(IllegalStateException.class, () -> vorstellung.kaufeTicket('A',7,30), "Platz bereits belegt Meldung nicht zurückgegeben");
+        assertAll("Execption",
+                () -> assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',7,2),
+                        "Nicht genug Geld Fehlermeldung nicht zurückgegeben"),
+                () -> assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('A',30,30),
+                        "Platz Fehlermeldung nicht zurückgegeben"),
+                () -> assertThrows(IllegalArgumentException.class, () -> vorstellung.kaufeTicket('G',3,30),
+                        "Reihe Fehlermeldung nicht zurückgegeben"),
+                () -> assertThrows(IllegalStateException.class, () -> vorstellung.kaufeTicket('A',7,30),
+                        "Platz bereits belegt Meldung nicht zurückgegeben")
+
+        );
+
     }
+
 
     @Test
     void testIfVorstellungIsInstanceOfVorstellung() {

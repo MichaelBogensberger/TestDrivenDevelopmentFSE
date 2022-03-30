@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -27,7 +28,6 @@ public class TestKinoVerwaltung {
     private KinoVerwaltung kinoVerwaltung;
 
 
-
     @BeforeEach
     void setup() {
         // Kinosaal anlegen
@@ -37,10 +37,11 @@ public class TestKinoVerwaltung {
         map.put('C', 15);
         kinoSaal = new KinoSaal("KS1", map);
 
+        LocalDate localDate = LocalDate.now();
         kinoVerwaltung = new KinoVerwaltung();
 
-        vorstellung = new Vorstellung(kinoSaal,Zeitfenster.ABEND, LocalDate.parse("2020-01-08"),"Pulp Fiction", 10.3f);
-        vorstellung2 = new Vorstellung(kinoSaal,Zeitfenster.NACHMITTAG, LocalDate.parse("2022-01-18"),"Reservoir Dogs", 8.3f);
+        vorstellung = new Vorstellung(kinoSaal, Zeitfenster.ABEND, localDate, "Pulp Fiction", 10.3f);
+        vorstellung2 = new Vorstellung(kinoSaal, Zeitfenster.NACHMITTAG, localDate, "Reservoir Dogs", 8.3f);
     }
 
 
@@ -68,22 +69,71 @@ public class TestKinoVerwaltung {
 
         assertTrue(ticket instanceof Ticket);
 
+        assertAll("tickets",
+                () -> assertEquals('A', ticket.getReihe(), "Fehler bei Reihe"),
+                () -> assertEquals(3, ticket.getPlatz(), "Fehler beim Platz"),
+                () -> assertEquals(ticket.getDatum(), vorstellung.getDatum(), "Fehler beim Datum"),
+                () -> assertEquals(ticket.getZeitfenster(), vorstellung.getZeitfenster(), "Fehler beim Zeitfenster"),
+                () -> assertEquals(ticket.getSaal(), vorstellung.getSaal().getName(), "Fehler beim Saal")
+        );
 
-        assertEquals('A', ticket.getReihe(), "Fehler bei Reihe");
-        assertEquals(3,ticket.getPlatz(), "Fehler beim Platz");
-        assertEquals(ticket.getDatum(), vorstellung.getDatum(), "Fehler beim Datum");
-        assertEquals(ticket.getZeitfenster(), vorstellung.getZeitfenster(), "Fehler beim Zeitfenster");
-        assertEquals(ticket.getSaal(), vorstellung.getSaal().getName(), "Fehler beim Saal");
 
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "A, 3, 25",
+            "B, 1, 15",
+            "C, 4, 14",
+            "A, 5, 50",
+            "A, 8, 30",
+            "A, 2, 22"
+    })
+    void testKaufeTicketsParam(char reihe, int platz, float geld) {
+        Ticket ticket = new Ticket(kinoSaal.getName(), Zeitfenster.ABEND, LocalDate.now(), reihe, platz);
+        Ticket vorstellungTicket = vorstellung.kaufeTicket(reihe, platz, geld);
+
+        assertAll("tickets",
+                () -> assertEquals(ticket.getSaal(), vorstellungTicket.getSaal(), "falscher Saal"),
+                () -> assertEquals(ticket.getZeitfenster(), vorstellungTicket.getZeitfenster(), "falsches Zeitfenster"),
+                () -> assertEquals(ticket.getDatum(), vorstellungTicket.getDatum(), "falsches Datum"),
+                () -> assertEquals(ticket.getReihe(), vorstellungTicket.getReihe(), "falsche Reuhe"),
+                () -> assertEquals(ticket.getPlatz(), vorstellungTicket.getPlatz(), "falscher Platz")
+        );
     }
 
 
 
 
 
+    @ParameterizedTest
+    @CsvSource({
+            "A, 33, 22",
+            "N, 1, 15",
+            "B, 4, 1",
+            "G, 5, 50",
+            "J, 8, 30",
+            "C, 20, 2"
+    })
+    void testExpectedExceptionIllegalArgument(char reihe, int platz, float geld) {
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            vorstellung.kaufeTicket(reihe, platz, geld);
+        });
+
+    }
 
 
+    @Test
+    void testIllegalStateException() {
+        vorstellung.kaufeTicket('A', 5, 33);
 
+        assertThrows(IllegalStateException.class, () -> {
+            vorstellung.kaufeTicket('A', 5, 33);
+        });
+
+    }
 
 
 

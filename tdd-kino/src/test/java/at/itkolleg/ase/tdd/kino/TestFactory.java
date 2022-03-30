@@ -1,118 +1,83 @@
 package at.itkolleg.ase.tdd.kino;
 
-import org.junit.Assume;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
-import java.text.DecimalFormat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 public class TestFactory {
 
-    private static KinoSaal kinoSaal;
-    private static Vorstellung vorstellung;
-    private static KinoVerwaltung kinoVerwaltung;
+    private KinoSaal kinosaal;
+    private Vorstellung vorstellung;
+    private Vorstellung vorstellung2;
+    private KinoVerwaltung kinoVerwaltung;
 
-    @BeforeAll
-    static void setup() {
-        // Kinosaal anlegen
+
+
+    @BeforeEach
+    void setup() {
+        //Saal anlegen
         Map<Character, Integer> map = new HashMap<>();
-        map.put('A', 34);
-        map.put('B', 22);
-        map.put('C', 24);
-        map.put('D', 23);
-        map.put('E', 34);
-        map.put('F', 15);
-        map.put('G', 15);
-        kinoSaal = new KinoSaal("KS1", map);
+        map.put('A', 20);
+        map.put('B', 10);
+        map.put('C', 15);
+        kinosaal = new KinoSaal("KS2", map);
 
+        //Vorsellung anlegen
+        LocalDate localDate = LocalDate.now();
+        vorstellung = new Vorstellung(kinosaal, Zeitfenster.NACHT, localDate, "Der Pate", 10.50F);
+        vorstellung2 = new Vorstellung(kinosaal, Zeitfenster.ABEND, localDate, "GoodFellas", 7.50F);
+
+        //KinoVerwaltung anlegen
         kinoVerwaltung = new KinoVerwaltung();
-
-        vorstellung = new Vorstellung(kinoSaal,Zeitfenster.ABEND, LocalDate.parse("2020-01-08"),"Pulp Fiction", 10.3f);
+        kinoVerwaltung.einplanenVorstellung(vorstellung);
+        kinoVerwaltung.einplanenVorstellung(vorstellung2);
     }
 
 
+    @org.junit.jupiter.api.TestFactory
+    public Collection<DynamicTest> kaufeTicketCollection() {
 
-    private static List values() {
+        List<DynamicTest> testListe = new ArrayList<>();
 
-        ArrayList<Arguments> values = new ArrayList<>();
+        for (int i = 0; i < 25; i++) {
+            Vorstellung vorstellung = kinoVerwaltung.getVorstellungen().get(i % 2);
+            char reihe = (char) ((i % 3) + 65);
+            int platz = i % 12;
+            int geld = i;
 
-
-        Random rd = new Random();
-        //String abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String abc = "ABCDEFGHIJKLMNO";
-
-        for(int i = 0; i < 2000; i++) {
-            char letter = abc.charAt(rd.nextInt(abc.length()));
-            int platz = rd.nextInt(20);
-
-            float geld = rd.nextFloat(35);
-            geld = ((int) ((geld + 0.005f) * 100)) / 100f;
-
-            System.out.println(letter + "  " + platz + "  " + geld);
-
-
-
-            values.add(arguments(vorstellung, letter, platz, geld));
+            testListe.add(dynamicTest(vorstellung.getFilm() + ", " + reihe + platz + ", " + geld + "€",
+                    () -> {
+                        try {
+                            kinoVerwaltung.kaufeTicket(vorstellung, reihe, platz, geld);
+                            System.out.println("Erfolgreich");
+                        } catch (IllegalArgumentException e) {
+                            boolean errGeld = "Nicht ausreichend Geld.".equals(e.getMessage());
+                            boolean errPlatz = e.getMessage().contains("existiert nicht");
+                            assertTrue(errGeld || errPlatz);
+                            System.out.println("Execption: " + e.getMessage());
+                        } catch (IllegalStateException e) {
+                            assertTrue(e.getMessage().contains("ist bereits belegt."));
+                            System.out.println("Execption: " + e.getMessage());
+                        }
+                    }));
         }
-
-
-
-
-        return values;
-
-    }
-
-
-
-
-
-
-    @ParameterizedTest
-    @MethodSource("values")
-    void testKaufeTicketsBomb(Vorstellung vorstellungP, char reihe, int platz, float geld) {
-
-        try {
-            Ticket ticket = kinoVerwaltung.kaufeTicket(vorstellungP, reihe, platz, geld);
-            System.out.println("Erfolgreich");
-        } catch (IllegalArgumentException e) {
-            System.out.println("Exeption thrown: " + e);
-
-        } catch (IllegalStateException e) {
-            System.out.println("Exeption thrown: " + e);
-
-        }
-
-
-
 
         /*
-        System.out.println("---- Parameter ----");
-        System.out.println("Vorstellung: " + vorstellungP);
-        System.out.println("Reihe: " + reihe);
-        System.out.println("Platz: " + platz);
-        System.out.println("Geld: " + geld);
-        System.out.println("-------------------");
+        for (DynamicTest dynamicTest : testListe) {
+            System.out.println(dynamicTest.getDisplayName());
+        }
         */
 
 
-    /*
-        assertEquals(reihe, ticket.getReihe(), "Fehler bei Reihe");
-        assertEquals(platz,ticket.getPlatz(), "Fehler beim Platz");
-        assertEquals(ticket.getDatum(), vorstellungP.getDatum(), "Fehler beim Datum");
-        assertEquals(ticket.getZeitfenster(), vorstellungP.getZeitfenster(), "Fehler beim Zeitfenster");
-        assertEquals(ticket.getSaal(), vorstellungP.getSaal().getName(), "Fehler beim Saal");
-    */
-
-
+        return testListe;
     }
+
 
 
 

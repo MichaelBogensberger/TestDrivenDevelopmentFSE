@@ -28,10 +28,15 @@ public class TestKinoSaal {
 
     @Test
     void testPruefePlatz() {
-        assertTrue(kinoSaal.pruefePlatz('A', 8));
-        assertFalse(kinoSaal.pruefePlatz('B',11));
-        assertTrue(kinoSaal.pruefePlatz('C',1));
-        assertFalse(kinoSaal.pruefePlatz('D',7));
+
+        assertAll("pruefePlatz",
+                () -> assertTrue(kinoSaal.pruefePlatz('A', 8)),
+                () -> assertFalse(kinoSaal.pruefePlatz('B',11)),
+                () -> assertTrue(kinoSaal.pruefePlatz('C',1)),
+                () -> assertFalse(kinoSaal.pruefePlatz('D',7))
+        );
+
+
     }
 
     @Test
@@ -41,8 +46,13 @@ public class TestKinoSaal {
 
     @Test
     void testIfKinoSaalIsInstanceOfKinoSaal() {
-        assertTrue(kinoSaal.equals(kinoSaal));
-        assertFalse(kinoSaal.equals(new Object()));
+
+        assertAll("equals",
+                () -> assertTrue(kinoSaal.equals(kinoSaal)),
+                () ->  assertFalse(kinoSaal.equals(new Object()))
+        );
+
+
     }
 
 
