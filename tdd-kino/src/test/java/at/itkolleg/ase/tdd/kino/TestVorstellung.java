@@ -33,18 +33,18 @@ public class TestVorstellung {
     @Test
     void testCreateNewVorstellung() {
 
+        Vorstellung vorstellung1 = new Vorstellung(kinoSaal,Zeitfenster.ABEND, LocalDate.parse("2020-01-08"),"Pulp Fiction", 10.3f);
 
-
-        assertNotNull(vorstellung, "Vortstellung ist NULL");
-        assertTrue(vorstellung instanceof Vorstellung, "Vorstellung ist nicht eine Insatz einer Vorstellung");
+        assertNotNull(vorstellung1, "Vortstellung ist NULL");
+        assertTrue(vorstellung1 instanceof Vorstellung, "Vorstellung ist nicht eine Insatz einer Vorstellung");
 
 
         assertAll("check parameters",
-                () ->  assertEquals(kinoSaal, vorstellung.getSaal(), "Fehler beim Kinosaal"),
-                () -> assertEquals(Zeitfenster.ABEND, vorstellung.getZeitfenster(), "Fehler beim Zeitfenster"),
-                () -> assertEquals(LocalDate.parse("2020-01-08"), vorstellung.getDatum(), "Fehler beim Datum"),
-                () -> assertEquals("Pulp Fiction", vorstellung.getFilm(), "Fehler beim Film"),
-                () -> assertEquals(10.3f, vorstellung.getPreis(), "Fehler beim Preis")
+                () ->  assertEquals(kinoSaal, vorstellung1.getSaal(), "Fehler beim Kinosaal"),
+                () -> assertEquals(Zeitfenster.ABEND, vorstellung1.getZeitfenster(), "Fehler beim Zeitfenster"),
+                () -> assertEquals(LocalDate.parse("2020-01-08"), vorstellung1.getDatum(), "Fehler beim Datum"),
+                () -> assertEquals("Pulp Fiction", vorstellung1.getFilm(), "Fehler beim Film"),
+                () -> assertEquals(10.3f, vorstellung1.getPreis(), "Fehler beim Preis")
         );
 
 
